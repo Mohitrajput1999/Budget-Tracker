@@ -5,7 +5,6 @@ const totalAmountButton = document.getElementById("total-amount-button");
 const productTitle = document.getElementById("product-title");
 const errorMessage = document.getElementById("budget-error");
 const productTitleError = document.getElementById("product-title-error");
-const productCostError = document.getElementById("product-cost-error");
 const amount = document.getElementById("amount");
 const expenditureValue = document.getElementById("expenditure-value");
 const balanceValue = document.getElementById("balance-amount");
@@ -56,11 +55,17 @@ const modifyElement = (element, edit = false) => {
 };
 
 // Function To Create List
-const listCreator = (expenseName, expenseValue) => {
+// Function To Create List
+// Function To Create List
+// Function To Create List
+const listCreator = (expenseName, expenseValue, expenseDateTime) => {
   let sublistContent = document.createElement("div");
   sublistContent.classList.add("sublist-content", "flex-space");
-  list.appendChild(sublistContent);
-  sublistContent.innerHTML = `<p class="product">${expenseName}</p><p class="amount">${expenseValue}</p>`;
+  sublistContent.innerHTML = `
+    <p class="product">${expenseName}</p>
+    <p class="amount">${expenseValue}</p>
+    <p class="datetime">${expenseDateTime}</p>
+  `;
   let editButton = document.createElement("button");
   editButton.classList.add("fa-solid", "fa-pen-to-square", "edit");
   editButton.style.fontSize = "1.2em";
@@ -75,8 +80,22 @@ const listCreator = (expenseName, expenseValue) => {
   });
   sublistContent.appendChild(editButton);
   sublistContent.appendChild(deleteButton);
-  document.getElementById("list").appendChild(sublistContent);
+
+  const expenseDate = new Date(expenseDateTime);
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0);
+
+  if (expenseDate >= currentDate) {
+    // Insert at the beginning of the list
+    list.insertBefore(sublistContent, list.firstChild);
+  } else {
+    // Insert at the end of the list
+    list.appendChild(sublistContent);
+  }
 };
+
+
+
 
 // Function To Add Expenses
 checkAmountButton.addEventListener("click", () => {
@@ -95,8 +114,20 @@ checkAmountButton.addEventListener("click", () => {
   // Total balance (budget - total expense)
   const totalBalance = tempAmount - sum;
   balanceValue.innerText = totalBalance;
+  
+  // Selected date and time
+  const expenseDateTime = document.getElementById("expense-datetime");
+  const selectedDateTime = expenseDateTime.value ? new Date(expenseDateTime.value) : new Date();
+  const options = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+  };
+  const expenseDateTimeValue = selectedDateTime.toLocaleString(undefined, options);
   // Create list
-  listCreator(productTitle.value, userAmount.value);
+  listCreator(productTitle.value, userAmount.value, expenseDateTimeValue);
   // Empty inputs
   productTitle.value = "";
   userAmount.value = "";
